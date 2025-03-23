@@ -1,0 +1,112 @@
+recipe-management-app/
+├── public/                    # Assets statiques (images, icônes, etc.)
+│   ├── favicon.ico
+│   └── images/
+│       └── recipe-placeholder.png
+├── src/                       # Code source principal
+│   ├── app/                   # Pages et layout (routes Next.js)
+│   │   ├── layout.tsx         # Layout global avec menu de navigation principal
+│   │   ├── auth/              # Tout ce qui concerne l'authentification
+│   │   │   ├── connexion/     # Page de connexion
+│   │   │   │   └── page.tsx
+│   │   │   └── inscription/   # Page d'inscription
+│   │   │       └── page.tsx
+│   │   ├── recettes/          # Tout ce qui concerne les recettes
+│   │   │   ├── page.tsx       # Liste des recettes de l'utilisateur connecté
+│   │   │   ├── [id]/          # Détails d'une recette (dynamique)
+│   │   │   │   └── page.tsx
+|   |   |   |       └── modifier/
+|   |   |   |           └── page.tsx
+│   │   │   ├── publiques/     # Liste des recettes publiques (exclut celles de l'utilisateur)
+│   │   │   │   └── page.tsx
+│   │   │   ├── ajouter/     
+│   │   │   │   └── page.tsx
+│   │   │   ├── utilisateur/   # Sous-section pour les recettes de l'utilisateur
+│   │   │   │   ├── page.tsx   # Page principale avec onglets (publiques/privées/enregistrées)
+│   │   │   │   ├── publiques/ # Liste des recettes publiques de l'utilisateur
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── privees/   # Liste des recettes privées de l'utilisateur
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── enregistrees/ # Liste des recettes enregistrées
+│   │   │   │       └── page.tsx
+│   │   │   └── modals/        # Modaux spécifiques aux recettes
+│   │   │       └── ChoixInventaireModal.tsx
+│   │   ├── aliments/          # Tout ce qui concerne les ingredients
+│   │   │   ├── page.tsx       # Liste des ingredient
+│   │   │   └── ajouter/       # Formulaire d'ajout ingredient
+│   │   │       └── page.tsx
+│   │   ├── courses/           # Tout ce qui concerne les courses
+│   │   │   ├── page.tsx       # Liste des courses générale
+│   │   │   └── creer/    
+│   │   │       └── page.tsx
+│   │   │   └── generer/    
+│   │   │       └── page.tsx
+│   │   │   └── [id]/    
+│   │   │       └── page.tsx
+│   │   ├── inventaires/       # Tout ce qui concerne les inventaires
+│   │   │   ├── page.tsx       # Liste des inventaires
+│   │   │   ├── [id]/          # Détails d'un inventaire (dynamique)
+│   │   │   │   └── page.tsx
+|   |   |   |       └── ajouter-ingredient
+|   |   |   |           └── page.tsx
+│   │   │   └── creer/ # Formulaire de creation à un inventaire
+│   │   │       └── page.tsx
+│   │   └── globals.css        # Styles globaux Tailwind
+│   ├── components/            # Composants réutilisables
+│   │   ├── layout/            # Composants de mise en page
+│   │   │   ├── Navbar.tsx     # Menu principal (accessible partout)
+│   │   │   └── SubNav.tsx     # Sous-menu pour navigation interne (ex. onglets)
+│   │   │   └── Navigation.tsx
+│   │   │   └── SideBar.tsx
+│   │   │   └── ClientLayout.tsx
+│   │   ├── ui/                # Composants UI génériques
+│   │   │   ├── Button.tsx
+│   │   │   ├── Input.tsx
+│   │   │   ├── Tab.tsx        # Onglet pour navigation interne
+│   │   │   └── SearchBar.tsx
+│   │   ├── features/          # Composants spécifiques aux fonctionnalités
+│   │   │   ├── recettes/      # Composants liés aux recettes
+│   │   │   │   ├── RecetteCard.tsx
+│   │   │   │   └── RecetteList.tsx
+│   │   │   ├── aliments/      # Composants liés aux aliments
+│   │   │   │   ├── AlimentCard.tsx
+│   │   │   │   └── AlimentList.tsx
+│   │   │   ├── inventaires/   # Composants liés aux inventaires
+│   │   │   │   ├── InventaireCard.tsx
+│   │   │   │   └── InventaireList.tsx
+│   │   │   └── courses/       # Composants liés aux courses
+│   │   │       ├── CourseCard.tsx
+│   │   │       └── CourseList.tsx
+│   │   └── modals/            # Composants modaux réutilisables
+│   │       └── Modal.tsx
+│   ├── lib/                   # Logique métier et utilitaires
+│   │   ├── api/               # Gestion des appels API
+│   │   │   ├── auth.ts
+│   │   │   ├── recettes.ts
+│   │   │   ├── aliments.ts
+│   │   │   └── inventaires.ts
+│   │   ├── types/             # Types TypeScript
+│   │   │   ├── auth.ts
+│   │   │   ├── recette.ts
+│   │   │   ├── aliment.ts
+│   │   │   └── inventaire.ts
+│   │   ├── utils/             # Fonctions utilitaires
+│   │   │   ├── format.ts
+│   │   │   └── validation.ts
+│   ├── context/               # Gestion de l'état global
+│   │   └── AuthContext.tsx
+│   ├── hooks/                 # Hooks personnalisés
+│   │   ├── useApi.ts
+│   │   └── useForm.ts
+│   ├── styles/                # Styles personnalisés (si besoin)
+│   │   └── custom.css
+│   └── assets/                # Images ou fichiers statiques spécifiques
+│       └── icons/
+├── .env                       # Variables d'environnement
+├── .eslintrc.js              # Configuration ESLint
+├── .prettierrc               # Configuration Prettier
+├── tailwind.config.js        # Configuration Tailwind CSS
+├── tsconfig.json             # Configuration TypeScript
+├── next.config.js            # Configuration Next.js
+├── package.json              # Dépendances et scripts
+└── README.md                 # Documentation
