@@ -1,33 +1,37 @@
+"use client";
 import { useState } from "react";
 
 interface FormField {
-  value: string | number | boolean;
-  error?: string;
+  value: string;
 }
 
-export function useForm(initialValues: Record<string, any>) {
-  const [values, setValues] = useState<FormField>(initialValues);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+type FormValues<T extends Record<string, FormField>> = T;
+type Errors<T> = Partial<Record<keyof T, string>>;
+type ValidationRules<T> = Partial<Record<keyof T, (value: string) => string | null>>;
 
-  const handleChange = (name: string, value: string | number | boolean) => {
-    setValues((prev) => ({ ...prev, [name]: { value, error: undefined } }));
-    setErrors((prev) => ({ ...prev, [name]: "" }));
+export const useForm = <T extends Record<string, FormField>>(initialValues: T) => {
+  const [values, setValues] = useState<T>(initialValues);
+  const [errors, setErrors] = useState<Errors<T>>({});
+
+  const handleChange = (field: keyof T, value: string) => {
+    setValues((prev) => ({
+      ...prev,
+      [field]: { ...prev[field], value },
+    }));
   };
 
-  const validate = (rules: Record<string, (value: any) => string | null>) => {
-    const newErrors: Record<string, string> = {};
-    Object.keys(rules).forEach((key) => {
-      const error = rules[key](values[key]?.value);
-      if (error) newErrors[key] = error;
-    });
+  const validate = (rules: ValidationRules<T>): boolean => {
+    const newErrors: Errors<T> = {};
+    for (const field in rules) {
+      const rule = rules[field];
+      if (rule) {
+        const error = rule(values[field].value);
+        if (error) newErrors[field] = error;
+      }
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const reset = () => {
-    setValues(initialValues);
-    setErrors({});
-  };
-
-  return { values, errors, handleChange, validate, reset };
-}
+  return { values, errors, handleChange, validate };
+};

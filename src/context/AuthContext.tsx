@@ -1,10 +1,11 @@
 "use client";
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { login, register, refreshToken, getProfile, logout } from "@/lib/api/auth";
-import { User, AuthResponse } from "@/lib/types/auth";
+import { login, register, refreshToken, logout } from "@/lib/api/auth"; // Supprimé getProfile
+import { User } from "@/lib/types/auth"; // Supprimé AuthResponse
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+
 
 interface AuthContextType {
   user: User | null;
@@ -32,6 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const router = useRouter();
 
+
   useEffect(() => {
     const initializeAuth = async () => {
       const storedAccessToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
@@ -41,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         try {
           setToken(storedAccessToken);
           setIsAuthenticated(true);
-          await fetchUserProfile(); // Récupère le profil au démarrage
+          await fetchUserProfile();
         } catch (error) {
           console.error("Erreur lors de l’initialisation :", error);
           await refresh();
@@ -56,42 +58,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }, 10 * 60 * 1000); // 10 minutes
     return () => clearInterval(interval);
-  }, [isAuthenticated]);
+  }, [isAuthenticated, fetchUserProfile, refresh]); // Ajouté fetchUserProfile et refresh
 
   const fetchUserProfile = async () => {
     setLoadingProfile(true);
     setErrorProfile(null);
     try {
       const storedToken = localStorage.getItem("accessToken");
-      console.log("Token envoyé dans l’en-tête:", storedToken);
       if (!storedToken) {
         setErrorProfile("Aucun token d'authentification trouvé.");
         return;
       }
-      // Adjusted to /auth/profil assuming a prefix
       const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/profil`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
-      console.log("Profil récupéré:", response.data.utilisateur);
       setUser(response.data.utilisateur);
-    } catch (err) {
-      const error = err as any;
-      if (error.response) {
-        console.log("Server response:", error.response.data);
-        setErrorProfile(`Erreur ${error.response.status}: ${error.response.statusText} - ${error.response.data.message || ""}`);
-        if (error.response.status === 401) {
+    } catch (error: unknown) { // Remplacé any par unknown
+      const err = error as any;
+      if (err.response) {
+        setErrorProfile(`Erreur ${err.response.status}: ${err.response.statusText} - ${err.response.data.message || ""}`);
+        if (err.response.status === 401) {
           await refresh();
         }
-      } else if (error.request) {
+      } else if (err.request) {
         setErrorProfile("Aucune réponse du serveur. Vérifiez NEXT_PUBLIC_API_URL.");
       } else {
-        setErrorProfile(`Erreur: ${error.message}`);
+        setErrorProfile(`Erreur: ${err.message}`);
       }
-      console.error("Détails de l’erreur:", err);
+      console.error("Détails de l’erreur:", error);
     } finally {
       setLoadingProfile(false);
     }
   };
+
   const refresh = async () => {
     const storedRefreshToken = typeof window !== "undefined" ? localStorage.getItem("refreshToken") : null;
     if (!storedRefreshToken) {
@@ -107,7 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(access_token);
       await fetchUserProfile();
       setIsAuthenticated(true);
-    } catch (error) {
+    } catch (error: unknown) { // Remplacé any par unknown
       console.error("Erreur lors du rafraîchissement du token :", error);
       await handleLogout();
       toast.error("Session expirée, veuillez vous reconnecter.");
@@ -127,8 +126,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await fetchUserProfile();
       setShowLoginModal(false);
       router.push("/recettes");
-    } catch (error: any) {
-      toast.error("Erreur lors de la connexion : " + (error.response?.data?.message || error.message));
+    } catch (error: unknown) { // Remplacé any par unknown
+      const err = error as any;
+      toast.error("Erreur lors de la connexion : " + (err.response?.data?.message || err.message));
       throw error;
     }
   };
@@ -146,8 +146,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await fetchUserProfile();
       setShowLoginModal(false);
       router.push("/recettes");
-    } catch (error: any) {
-      toast.error("Erreur lors de l’inscription : " + (error.response?.data?.message || error.message));
+    } catch (error: unknown) { // Remplacé any par unknown
+      const err = error as any;
+      toast.error("Erreur lors de l’inscription : " + (err.response?.data?.message || err.message));
       throw error;
     }
   };
@@ -164,8 +165,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       toast.success("Déconnexion réussie !");
       router.push("/");
-    } catch (error: any) {
-      toast.error("Erreur lors de la déconnexion : " + (error.response?.data?.message || error.message));
+    } catch (error: unknown) { // Remplacé any par unknown
+      const err = error as any;
+      toast.error("Erreur lors de la déconnexion : " + (err.response?.data?.message || err.message));
     }
   };
 
