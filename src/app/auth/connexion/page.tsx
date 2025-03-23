@@ -25,7 +25,7 @@ export default function ConnexionPage() {
     if (validate(rules)) {
       try {
         await login(values.email.value as string, values.password.value as string);
-      } catch (err) {
+      } catch { // Supprimé err inutilisé
         setError("Échec de la connexion. Vérifiez vos identifiants.");
       }
     }

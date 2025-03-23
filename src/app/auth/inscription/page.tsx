@@ -27,7 +27,7 @@ export default function InscriptionPage() {
     if (validate(rules)) {
       try {
         await register(values.email.value as string, values.password.value as string, values.nom.value as string);
-      } catch (err) {
+      } catch { // Supprimé err inutilisé
         setError("Échec de l'inscription. Cet email est peut-être déjà utilisé.");
       }
     }
@@ -85,7 +85,7 @@ export default function InscriptionPage() {
         </button>
       </form>
       <p className="mt-4 text-center">
-        Déjà un compte ? <a href="/auth/connexion" className="text-blue-500 hover:underline">Connectez-vous</a>
+        Deja un compte ? <a href="/auth/connexion" className="text-blue-500 hover:underline">Connectez-vous</a>
       </p>
     </div>
   );

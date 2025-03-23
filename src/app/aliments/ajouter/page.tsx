@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { ShoppingBag, ArrowLeft, Plus } from "lucide-react";
 import Link from "next/link";
@@ -42,12 +41,6 @@ export default function AjouterIngredient() {
     { value: "cuillère à café", label: "Cuillère à café" },
   ];
 
-  // Real-time validation
-  useEffect(() => {
-    const newErrors = validateForm();
-    setErrors(newErrors);
-  }, [newIngredient.nom, newIngredient.prix_unitaire]);
-
   const validateForm = (): FormErrors => {
     const newErrors: FormErrors = {};
     if (!newIngredient.nom.trim()) newErrors.nom = "Le nom de l'ingrédient est requis.";
@@ -57,6 +50,11 @@ export default function AjouterIngredient() {
     }
     return newErrors;
   };
+
+  useEffect(() => {
+    const newErrors = validateForm();
+    setErrors(newErrors);
+  }, [newIngredient.nom, newIngredient.prix_unitaire, validateForm]);
 
   const handleAddIngredient = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,24 +76,16 @@ export default function AjouterIngredient() {
         unite: newIngredient.unite,
         prix_unitaire: newIngredient.prix_unitaire ? parseFloat(newIngredient.prix_unitaire) : undefined,
       };
-      console.log("Données envoyées:", ingredientData);
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/ingredients`,
-        ingredientData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      console.log("Réponse reçue:", response.data);
-      if (response.status === 201) {
+      const response = await createIngredient(ingredientData);
+      if (response) {
         toast.success("Ingrédient ajouté avec succès !", { duration: 3000 });
         router.push("/aliments");
       }
-    } catch (error: any) {
-      // console.error("Erreur complète:", error);
-      // console.error("Statut:", error.response?.status);
-      // console.error("Données de réponse:", error.response?.data);
-      toast.error(error.response?.data?.message || "Erreur lors de l'ajout de l'ingrédient.", {
-        duration: 4000,
-      });
+    } catch (error: unknown) {
+      toast.error(
+        (error as any)?.response?.data?.message || "Erreur lors de l'ajout de l'ingrédient.",
+        { duration: 4000 }
+      );
     } finally {
       setIsSubmitting(false);
     }

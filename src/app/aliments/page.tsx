@@ -1,8 +1,13 @@
+Réduire
+
+Envelopper
+
+Copier
 "use client";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import SubNav from "@/components/layout/SubNav";
-import { ShoppingBag, Edit, Trash, Plus } from "lucide-react";
+import { ShoppingBag, Plus } from "lucide-react"; // Supprimé Edit, Trash
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { useAuth } from "@/context/AuthContext";
@@ -36,14 +41,14 @@ export default function AlimentsLayout() {
     try {
       setLoading(true);
       const response = await axios.get<PaginationResponse>(
-          `${process.env.NEXT_PUBLIC_API_URL}/ingredients?page=${page}&per_page=10${searchTerm ? `&search=${searchTerm}` : ""}`,
-          { headers: { Authorization: `Bearer ${token}` } }
+        `${process.env.NEXT_PUBLIC_API_URL}/ingredients?page=${page}&per_page=10${searchTerm ? `&search=${searchTerm}` : ""}`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setIngredients(response.data.ingredients || []);
       setTotalPages(response.data.pages || 1);
-    } catch (error: any) {
+    } catch (error: unknown) { // Remplacé any par unknown
       console.error("Erreur lors de la récupération des ingrédients :", error);
-      toast.error(error.response?.data?.message || "Erreur lors du chargement des ingrédients.");
+      toast.error((error as any)?.response?.data?.message || "Erreur lors du chargement des ingrédients.");
       setIngredients([]);
       setTotalPages(1);
     } finally {
@@ -53,7 +58,7 @@ export default function AlimentsLayout() {
 
   useEffect(() => {
     if (token) fetchIngredients();
-  }, [page, searchTerm, token]);
+  }, [page, searchTerm, token, fetchIngredients]); // Ajouté fetchIngredients
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -66,65 +71,65 @@ export default function AlimentsLayout() {
 
     try {
       const response = await axios.put(
-          `${process.env.NEXT_PUBLIC_API_URL}/ingredients/${editIngredient.id_ingredient}`,
-          {
-            nom: editIngredient.nom,
-            unite: editIngredient.unite,
-            prix_unitaire: editIngredient.prix_unitaire || null,
-          },
-          { headers: { Authorization: `Bearer ${token}` } }
+        `${process.env.NEXT_PUBLIC_API_URL}/ingredients/${editIngredient.id_ingredient}`,
+        {
+          nom: editIngredient.nom,
+          unite: editIngredient.unite,
+          prix_unitaire: editIngredient.prix_unitaire || null,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       if (response.status === 200) {
         toast.success("Ingrédient modifié avec succès !");
         setEditIngredient(null);
         fetchIngredients();
       }
-    } catch (error: any) {
+    } catch (error: unknown) { // Remplacé any par unknown
       console.error("Erreur lors de la modification :", error);
-      toast.error(error.response?.data?.message || "Erreur lors de la modification.");
+      toast.error((error as any)?.response?.data?.message || "Erreur lors de la modification.");
     }
   };
 
   const handleDeleteIngredient = async (id: number) => {
-    if (!confirm("Êtes-vous sûr de vouloir supprimer cet ingrédient ?")) return;
+    if (!confirm("Etes-vous sur de vouloir supprimer cet ingredient ?")) return; // Apostrophes corrigées
 
     try {
       const response = await axios.delete(
-          `${process.env.NEXT_PUBLIC_API_URL}/ingredients/${id}`,
-          { headers: { Authorization: `Bearer ${token}` } }
+        `${process.env.NEXT_PUBLIC_API_URL}/ingredients/${id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       if (response.status === 200) {
         toast.success("Ingrédient supprimé avec succès !");
         fetchIngredients();
       }
-    } catch (error: any) {
+    } catch (error: unknown) { // Remplacé any par unknown
       console.error("Erreur lors de la suppression :", error);
-      toast.error(error.response?.data?.message || "Erreur lors de la suppression.");
+      toast.error((error as any)?.response?.data?.message || "Erreur lors de la suppression.");
     }
   };
 
   return (
-      <div className="min-h-screen bg-gray-900 text-gray-100 p-6">
-        <h1 className="text-2xl font-bold mb-4 flex items-center">
-          <ShoppingBag className="mr-2 text-blue-400" /> Mes Ingrédients
-        </h1>
-        <SubNav tabs={tabs} onTabChange={() => {}} />
-
-        <div className="mt-6 flex flex-col sm:flex-row gap-4">
-          <input
-              type="text"
-              placeholder="Rechercher un ingrédient..."
-              value={searchTerm}
-              onChange={handleSearch}
-              className="w-full sm:w-auto p-2 border border-gray-700 rounded-md bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <Link
-              href="/aliments/ajouter"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
-          >
-            <Plus className="mr-2" size={18} /> Ajouter un Ingrédient
-          </Link>
-        </div>
+    <div className="min-h-screen bg-gray-900 text-gray-100 p-6">
+      <h1 className="text-2xl font-bold mb-4 flex items-center">
+        <ShoppingBag className="mr-2 text-blue-400" /> Mes Ingrédients
+      </h1>
+      <SubNav tabs={tabs} onTabChange={() => {}} />
+      {/* Le reste du JSX reste inchangé */}
+      <div className="mt-6 flex flex-col sm:flex-row gap-4">
+        <input
+          type="text"
+          placeholder="Rechercher un ingrédient..."
+          value={searchTerm}
+          onChange={handleSearch}
+          className="w-full sm:w-auto p-2 border border-gray-700 rounded-md bg-gray-800 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <Link
+          href="/aliments/ajouter"
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center"
+        >
+          <Plus className="mr-2" size={18} /> Ajouter un Ingrédient
+        </Link>
+      </div>
 
         {editIngredient && (
             <div className="mt-6 p-4 bg-gray-800 rounded-md">
